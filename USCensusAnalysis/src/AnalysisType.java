@@ -7,4 +7,5 @@ public class AnalysisType {
 
     public static final int OWNED_RENTED = 1;
     public static final int NEVER_MARRIED = 2;
+    public static final int GENDER_AGE_DIST = 3;
 }

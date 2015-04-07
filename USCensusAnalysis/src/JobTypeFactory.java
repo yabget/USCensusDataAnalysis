@@ -20,6 +20,8 @@ public class JobTypeFactory {
                 return new NeverMarried();
             case AnalysisType.OWNED_RENTED:
                 return new RentVsOwned();
+            case AnalysisType.GENDER_AGE_DIST:
+                return new GenderAgeDistribution();
         }
 
         return jobType;

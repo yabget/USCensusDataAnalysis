@@ -20,6 +20,9 @@ public class AnalyzeCensus {
             case "NM":
                 job = (new NeverMarried()).getJob();
                 break;
+            case "GAD":
+                job = (new GenderAgeDistribution()).getJob();
+                break;
             default:
                 Util.printValidCommands();
                 System.exit(1);
