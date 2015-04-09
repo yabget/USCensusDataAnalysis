@@ -19,7 +19,9 @@ public class Util {
         System.out.println("Valid commands are: ");
         System.out.println("\t\tNM - Never Married");
         System.out.println("\t\tRvO - Rent vs Owned");
+        System.out.println("\t\tRvU - Rural vs Urban");
         System.out.println("\t\tGAD - Gender Age Distribution");
+
     }
 
 }

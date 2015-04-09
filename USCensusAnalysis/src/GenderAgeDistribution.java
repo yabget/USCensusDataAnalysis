@@ -11,23 +11,23 @@ public class GenderAgeDistribution implements JobType {
 
     // All age boundaries are inclusive
 
-    public static final int MALE_UNDER_18_START = 3864;
-    public static final int MALE_UNDER_18_END = MALE_UNDER_18_START + (13 * 9);
+    private static final int MALE_UNDER_18_START = 3864;
+    private static final int MALE_UNDER_18_END = MALE_UNDER_18_START + (13 * 9);
 
-    public static final int MALE_19_TO_29_START = MALE_UNDER_18_END;
-    public static final int MALE_19_TO_29_END = MALE_19_TO_29_START + (5 * 9);
+    private static final int MALE_19_TO_29_START = MALE_UNDER_18_END;
+    private static final int MALE_19_TO_29_END = MALE_19_TO_29_START + (5 * 9);
 
-    public static final int MALE_30_TO_39_START = MALE_19_TO_29_END;
-    public static final int MALE_30_TO_39_END = MALE_30_TO_39_START + (2 * 9);
+    private static final int MALE_30_TO_39_START = MALE_19_TO_29_END;
+    private static final int MALE_30_TO_39_END = MALE_30_TO_39_START + (2 * 9);
 
-    public static final int FEMALE_UNDER_18_START = 4143;
-    public static final int FEMALE_UNDER_18_END = FEMALE_UNDER_18_START + (13 * 9);
+    private static final int FEMALE_UNDER_18_START = 4143;
+    private static final int FEMALE_UNDER_18_END = FEMALE_UNDER_18_START + (13 * 9);
 
-    public static final int FEMALE_19_TO_29_START = FEMALE_UNDER_18_END;
-    public static final int FEMALE_19_TO_29_END = FEMALE_19_TO_29_START + (5 * 9);
+    private static final int FEMALE_19_TO_29_START = FEMALE_UNDER_18_END;
+    private static final int FEMALE_19_TO_29_END = FEMALE_19_TO_29_START + (5 * 9);
 
-    public static final int FEMALE_30_TO_39_START = FEMALE_19_TO_29_END;
-    public static final int FEMALE_30_TO_39_END = FEMALE_30_TO_39_START + (2 * 9);
+    private static final int FEMALE_30_TO_39_START = FEMALE_19_TO_29_END;
+    private static final int FEMALE_30_TO_39_END = FEMALE_30_TO_39_START + (2 * 9);
 
     private int getSumAgeRange(String line, int start, int end){
         int sum = 0;
@@ -39,6 +39,10 @@ public class GenderAgeDistribution implements JobType {
 
     @Override
     public int[] getFields(String line) throws StringIndexOutOfBoundsException {
+        if(Integer.parseInt(line.substring(24, 28)) == 2){
+            return null;
+        }
+
         int[] ranges = new int[6];
         ranges[0] = getSumAgeRange(line, MALE_UNDER_18_START, MALE_UNDER_18_END);
         ranges[1] = getSumAgeRange(line, MALE_19_TO_29_START, MALE_19_TO_29_END);

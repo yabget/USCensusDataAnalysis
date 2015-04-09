@@ -18,10 +18,18 @@ public class JobTypeFactory {
         switch (analysisType){
             case AnalysisType.NEVER_MARRIED:
                 return new NeverMarried();
+
             case AnalysisType.OWNED_RENTED:
                 return new RentVsOwned();
+
             case AnalysisType.GENDER_AGE_DIST:
                 return new GenderAgeDistribution();
+
+            case AnalysisType.RURAL_URBAN:
+                return new RuralVsUrban();
+
+            case AnalysisType.MEDIAN_HOUSE_VALUE:
+                return new MedianHouseValue();
         }
 
         return jobType;

@@ -34,6 +34,12 @@ public class FieldsMapper extends Mapper<LongWritable, Text, Text, IntArrayWrita
         int[] outVals;
         try {
             outVals = jobType.getFields(line);
+            if(outVals == null){
+                return;
+            }
+        }
+        catch (NumberFormatException numForm){
+            return;
         }
         catch (StringIndexOutOfBoundsException sout){
             return;

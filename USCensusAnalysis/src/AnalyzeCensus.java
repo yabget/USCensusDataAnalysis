@@ -23,6 +23,12 @@ public class AnalyzeCensus {
             case "GAD":
                 job = (new GenderAgeDistribution()).getJob();
                 break;
+            case "RvU":
+                job = (new RuralVsUrban()).getJob();
+                break;
+            case "MHV":
+                job = (new MedianHouseValue()).getJob();
+                break;
             default:
                 Util.printValidCommands();
                 System.exit(1);

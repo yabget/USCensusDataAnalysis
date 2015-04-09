@@ -16,7 +16,11 @@ public class RentVsOwned implements JobType {
     private static final int RENTED_END = RENTED_START + 9;
 
     @Override
-    public int[] getFields(String line) throws StringIndexOutOfBoundsException {
+    public int[] getFields(String line) throws StringIndexOutOfBoundsException, NumberFormatException {
+        if(Integer.parseInt(line.substring(24, 28)) == 1){
+            return null;
+        }
+
         String ownedStr = line.substring(OWNED_START, OWNED_END);
         String rentedStr = line.substring(RENTED_START, RENTED_END);
 
