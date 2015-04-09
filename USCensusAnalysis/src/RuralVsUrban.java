@@ -20,9 +20,7 @@ public class RuralVsUrban implements JobType {
 
     @Override
     public int[] getFields(String line) throws StringIndexOutOfBoundsException {
-        if(Integer.parseInt(line.substring(24, 28)) == 1){
-            return null;
-        }
+        if(!Util.correctSegment(line, 2)) return null;
 
         String urban_in = line.substring(URBAN_IN_URBANIZED_START, URBAN_IN_URBANIZED_END);
         String urban_out = line.substring(URBAN_OUT_URBANIZED_START, URBAN_OUT_URBANIZED_END);

@@ -18,9 +18,7 @@ public class NeverMarried implements JobType {
 
     @Override
     public int[] getFields(String line) throws StringIndexOutOfBoundsException {
-        if(Integer.parseInt(line.substring(24, 28)) == 2){
-            return null;
-        }
+        if(!Util.correctSegment(line, 1)) return null;
 
         String male = line.substring(MALE_NM_START, MALE_NM_END);
         String female = line.substring(FEMALE_NM_START, FEMALE_NM_END);

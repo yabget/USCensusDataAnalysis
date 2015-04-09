@@ -30,6 +30,9 @@ public class JobTypeFactory {
 
             case AnalysisType.MEDIAN_HOUSE_VALUE:
                 return new MedianHouseValue();
+
+            case AnalysisType.MEDIAN_RENT:
+                return new MedianRent();
         }
 
         return jobType;

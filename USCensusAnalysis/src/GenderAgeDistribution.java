@@ -39,9 +39,7 @@ public class GenderAgeDistribution implements JobType {
 
     @Override
     public int[] getFields(String line) throws StringIndexOutOfBoundsException {
-        if(Integer.parseInt(line.substring(24, 28)) == 2){
-            return null;
-        }
+        if(!Util.correctSegment(line, 1)) return null;
 
         int[] ranges = new int[6];
         ranges[0] = getSumAgeRange(line, MALE_UNDER_18_START, MALE_UNDER_18_END);

@@ -10,29 +10,36 @@ import java.io.IOException;
  */
 public class AnalyzeCensus {
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Job job = null;
+    public static Job getJob(String jobAbbr) throws IOException {
 
-        switch (args[0]){
+        switch (jobAbbr){
             case "RvO":
-                job = (new RentVsOwned()).getJob();
-                break;
+                return (new RentVsOwned()).getJob();
+
             case "NM":
-                job = (new NeverMarried()).getJob();
-                break;
+                return (new NeverMarried()).getJob();
+
             case "GAD":
-                job = (new GenderAgeDistribution()).getJob();
-                break;
+                return (new GenderAgeDistribution()).getJob();
+
             case "RvU":
-                job = (new RuralVsUrban()).getJob();
-                break;
+                return (new RuralVsUrban()).getJob();
+
             case "MHV":
-                job = (new MedianHouseValue()).getJob();
-                break;
+                return (new MedianHouseValue()).getJob();
+
+            case "MR":
+                return (new MedianRent()).getJob();
+
             default:
                 Util.printValidCommands();
                 System.exit(1);
         }
+        return null;
+    }
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        Job job = getJob(args[0]);
 
         job.setJarByClass(AnalyzeCensus.class);
 

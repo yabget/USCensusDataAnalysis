@@ -7,37 +7,34 @@ import java.io.IOException;
 /**
  * Created by ydubale on 4/8/15.
  */
-public class MedianHouseValue implements JobType, MedianJob {
+public class MedianRent implements JobType, MedianJob {
 
     private static final int SEGMENT = 2;
 
-    private static final int NUM_FIELDS = 20;
+    private static final int NUM_FIELDS = 17;
     private static final int FIELD_SIZE = 9;
 
-    private static final int HOUSE_VALUE_START = 2928;
-    private static final int HOUSE_VALUE_END = HOUSE_VALUE_START + (NUM_FIELDS * FIELD_SIZE);
+    private static final int RENT_START = 3451;
+    private static final int RENT_END = RENT_START + (NUM_FIELDS * FIELD_SIZE);
 
-    private static final String[] houseCosts = {
-            "Less than $15,000",
-            "$15,000 - $19,999",
-            "$20,000 - $24,999",
-            "$25,000 - $29,999",
-            "$30,000 - $34,999",
-            "$35,000 - $39,999",
-            "$40,000 - $44,999",
-            "$45,000 - $49,999",
-            "$50,000 - $59,999",
-            "$60,000 - $74,999",
-            "$75,000 - $99,999",
-            "$100,000 - $124,999",
-            "$125,000 - $149,999",
-            "$150,000 - $174,999",
-            "$175,000 - $199,999",
-            "$200,000 - $249,999",
-            "$250,000 - $299,999",
-            "$300,000 - $399,999",
-            "$400,000 - $499,999",
-            "$500,000 or more"
+    private static final String[] rentRanges = {
+            "Less than $100",
+            "$100 to $149",
+            "$150 to $199",
+            "$200 to $249",
+            "$250 to $299",
+            "$300 to $349",
+            "$350 to $399",
+            "$400 to $449",
+            "$450 to $499",
+            "$500 to $549",
+            "$550 to $ 599",
+            "$600 to $649",
+            "$650 to $699",
+            "$700 to $749",
+            "$750 to $999",
+            "$1000 or more",
+            "No cash rent"
     };
 
     @Override
@@ -46,7 +43,7 @@ public class MedianHouseValue implements JobType, MedianJob {
 
         int[] fields = new int[NUM_FIELDS];
         int index = 0;
-        for(int i=HOUSE_VALUE_START; i < HOUSE_VALUE_END; i+=FIELD_SIZE){
+        for(int i=RENT_START; i < RENT_END; i+=FIELD_SIZE){
             fields[index] = Integer.parseInt(line.substring(i, i+FIELD_SIZE));
             index++;
         }
@@ -57,9 +54,9 @@ public class MedianHouseValue implements JobType, MedianJob {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.MEDIAN_HOUSE_VALUE);
+        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.MEDIAN_RENT);
 
-        Job job = Job.getInstance(conf, "Median House Value");
+        Job job = Job.getInstance(conf, "Median Rent");
 
         job.setMapperClass(FieldsMapper.class);
 
@@ -88,6 +85,6 @@ public class MedianHouseValue implements JobType, MedianJob {
 
     @Override
     public String[] getRangeDescriptions() {
-        return houseCosts;
+        return rentRanges;
     }
 }
