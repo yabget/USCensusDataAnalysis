@@ -1,17 +1,13 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Partitioner;
-import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by ydubale on 4/8/15.
  */
-public class MedianHouseValue implements JobType {
+public class MedianHouseValue implements JobType, MedianJob {
 
     private static final int HOUSE_VALUE_START = 2928;
     private static final int HOUSE_VALUE_END = HOUSE_VALUE_START + (20 * 9);
@@ -68,73 +64,27 @@ public class MedianHouseValue implements JobType {
 
         job.setMapOutputValueClass(IntArrayWritable.class);
 
-        job.setPartitionerClass(MHVPartioner.class);
-
         job.setNumReduceTasks(50);
 
-        job.setReducerClass(MHVReducer.class);
+        job.setPartitionerClass(StatePartitioner.class);
+
+        job.setReducerClass(MedianReducer.class);
 
         return job;
-    }
-
-    public static class MHVPartioner extends Partitioner<Text, IntArrayWritable>{
-
-        @Override
-        public int getPartition(Text text, IntArrayWritable intArrayWritable, int i) {
-            return text.toString().hashCode() % i;
-        }
-    }
-
-    public static class MHVReducer extends Reducer<Text, IntArrayWritable, Text, Text> {
-
-        private Map<Text, int[]> stateToVals = new HashMap<>();
-
-        public void reduce(Text key, Iterable<IntArrayWritable> value, Context context) throws IOException, InterruptedException {
-
-            int[] houseVals = stateToVals.get(key);
-            if(houseVals == null){
-                houseVals = new int[20];
-            }
-
-            for(IntArrayWritable field : value){
-                int[] nums = field.get();
-                for(int i=0; i< nums.length; i++){
-                    houseVals[i]+= nums[i];
-                }
-            }
-
-            stateToVals.put(key, houseVals);
-        }
-
-
-        public void cleanup(Context context) throws IOException, InterruptedException {
-
-            for(Text state : stateToVals.keySet()){
-                //context.write(state, new IntArrayWritable(stateToVals.get(state)));
-                long sum = 0;
-                int[] houseValues = stateToVals.get(state);
-
-                for(int hVal : houseValues){
-                    sum += hVal;
-                }
-
-                long midVal = sum/2;
-
-                long newSum = 0;
-                for(int i=0; i < houseValues.length; i++){
-                    if(newSum > midVal){
-                        context.write(state, new Text(houseCosts[i]));
-                        break;
-                    }
-                    newSum += houseValues[i];
-                }
-            }
-        }
-
     }
 
     @Override
     public String reduce(Iterable<IntArrayWritable> value) {
         return null;
+    }
+
+    @Override
+    public int getNumRanges() {
+        return 20;
+    }
+
+    @Override
+    public String[] getRangeDescriptions() {
+        return houseCosts;
     }
 }

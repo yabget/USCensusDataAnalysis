@@ -3,6 +3,10 @@
  */
 public class Util {
 
+    public static boolean correctSegment(String line, int segment){
+        return Integer.parseInt(line.substring(24, 28)) == segment;
+    }
+
     public static int[] convertStringsToInts(String... strings){
         int[] nums = new int[strings.length];
 
