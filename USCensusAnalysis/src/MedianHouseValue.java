@@ -57,7 +57,7 @@ public class MedianHouseValue implements JobType, MedianJob {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.MEDIAN_HOUSE_VALUE);
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.MEDIAN_HOUSE_VALUE);
 
         Job job = Job.getInstance(conf, "Median House Value");
 

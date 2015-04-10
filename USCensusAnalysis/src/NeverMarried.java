@@ -30,7 +30,7 @@ public class NeverMarried implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.NEVER_MARRIED);
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.NEVER_MARRIED);
 
         Job job = Job.getInstance(conf, "Never Married");
 

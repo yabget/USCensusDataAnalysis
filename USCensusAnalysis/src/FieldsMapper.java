@@ -15,7 +15,7 @@ public class FieldsMapper extends Mapper<LongWritable, Text, Text, IntArrayWrita
     public void setup(Context context){
         JobTypeFactory jobTypeFactory = JobTypeFactory.getInstance();
         Configuration conf = context.getConfiguration();
-        jobType = jobTypeFactory.getJobType(conf.getInt("JobType", 0));
+        jobType = jobTypeFactory.getJobType(conf.getEnum(Util.JOB_TYPE, AnalysisType.NOTHING));
     }
 
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {

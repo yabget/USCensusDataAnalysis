@@ -10,58 +10,24 @@ import java.io.IOException;
  */
 public class AnalyzeCensus {
 
-    public static Job getJob(String jobAbbr) throws IOException {
-
-        switch (jobAbbr){
-            //TODO: MAKE GET JOB STATIC
-            case "RvO":
-                return (new RentVsOwned()).getJob();
-
-            case "NM":
-                return (new NeverMarried()).getJob();
-
-            case "GAD":
-                return (new GenderAgeDistribution()).getJob();
-
-            case "RvU":
-                return (new RuralVsUrban()).getJob();
-
-            case "MHV":
-                return (new MedianHouseValue()).getJob();
-
-            case "MR":
-                return (new MedianRent()).getJob();
-
-            case "ANR":
-                return (new AvgNumRooms()).getJob();
-
-            case "EP":
-                return (new ElderlyPeople()).getJob();
-
-            default:
-                Util.printValidCommands();
-                System.exit(1);
-        }
-        return null;
-    }
-
-    public static void runJob(String jobName, String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Job job = getJob(jobName);
+    public static void runJob(AnalysisType analysisType, String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        Job job = JobTypeFactory.getInstance().getJobType(analysisType).getJob();
 
         job.setJarByClass(AnalyzeCensus.class);
 
         FileInputFormat.setInputPaths(job, new Path(args[1]));
 
-        FileOutputFormat.setOutputPath(job, new Path("/analyzeCensus/output/" + jobName));
+        FileOutputFormat.setOutputPath(job, new Path("/analyzeCensus/output/" + analysisType));
 
-        job.waitForCompletion(true);
+        job.waitForCompletion(false);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 
-        String[] jobNames = {"RvO", "NM", "GAD", "RvU", "MHV", "MR", "ANR", "EP" };
+        for(AnalysisType jobName : AnalysisType.values()){
+            if(jobName.equals(AnalysisType.NOTHING)) continue;
 
-        for(String jobName : jobNames){
+            System.out.println("RUNNNING JOB " + jobName);
             runJob(jobName, args);
             System.out.println("JOB " + jobName + " COMPLETED!!!!!!!!!!!!!!!!!!!!!");
         }

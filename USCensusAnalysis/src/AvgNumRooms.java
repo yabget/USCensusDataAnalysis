@@ -46,7 +46,7 @@ public class AvgNumRooms implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.AVG_NUM_ROOMS);
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.AVG_NUM_ROOMS);
 
         Job job = Job.getInstance(conf, "Avg Num Rooms");
 

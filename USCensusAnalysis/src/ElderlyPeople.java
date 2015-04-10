@@ -40,7 +40,7 @@ public class ElderlyPeople implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.ELDERLY_PEOPLE);
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.ELDERLY_PEOPLE);
 
         Job job = Job.getInstance(conf, "Elderly People");
 

@@ -11,33 +11,33 @@ public class JobTypeFactory {
     private JobTypeFactory() {
     }
 
-    public JobType getJobType(int analysisType){
+    public JobType getJobType(AnalysisType analysisType){
 
         JobType jobType = null;
 
         switch (analysisType){
-            case AnalysisType.NEVER_MARRIED:
+            case NEVER_MARRIED:
                 return new NeverMarried();
 
-            case AnalysisType.OWNED_RENTED:
+            case OWNED_RENTED:
                 return new RentVsOwned();
 
-            case AnalysisType.GENDER_AGE_DIST:
+            case GENDER_AGE_DIST:
                 return new GenderAgeDistribution();
 
-            case AnalysisType.RURAL_URBAN:
+            case RURAL_URBAN:
                 return new RuralVsUrban();
 
-            case AnalysisType.MEDIAN_HOUSE_VALUE:
+            case MEDIAN_HOUSE_VALUE:
                 return new MedianHouseValue();
 
-            case AnalysisType.MEDIAN_RENT:
+            case MEDIAN_RENT:
                 return new MedianRent();
 
-            case AnalysisType.AVG_NUM_ROOMS:
+            case AVG_NUM_ROOMS:
                 return new AvgNumRooms();
 
-            case AnalysisType.ELDERLY_PEOPLE:
+            case ELDERLY_PEOPLE:
                 return new ElderlyPeople();
         }
 

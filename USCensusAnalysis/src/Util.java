@@ -3,6 +3,8 @@
  */
 public class Util {
 
+    public static final String JOB_TYPE = "JobType";
+
     public static boolean correctSegment(String line, int segment){
         return Integer.parseInt(line.substring(24, 28)) == segment;
     }

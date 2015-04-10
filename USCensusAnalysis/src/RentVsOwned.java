@@ -29,7 +29,7 @@ public class RentVsOwned implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.OWNED_RENTED);
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.OWNED_RENTED);
 
         Job job = Job.getInstance(conf, "Rent vs Owned");
 

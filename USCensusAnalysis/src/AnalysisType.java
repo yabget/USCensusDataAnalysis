@@ -1,8 +1,19 @@
 /**
  * Created by ydubale on 4/6/15.
  */
-public class AnalysisType {
+public enum AnalysisType {
 
+    NOTHING,
+    OWNED_RENTED,
+    NEVER_MARRIED,
+    GENDER_AGE_DIST,
+    RURAL_URBAN,
+    MEDIAN_HOUSE_VALUE,
+    MEDIAN_RENT,
+    AVG_NUM_ROOMS,
+    ELDERLY_PEOPLE,
+    
+    /*
     public static final String JOB_TYPE = "JobType";
 
     public static final int OWNED_RENTED = 1;
@@ -13,4 +24,5 @@ public class AnalysisType {
     public static final int MEDIAN_RENT = 6;
     public static final int AVG_NUM_ROOMS = 7;
     public static final int ELDERLY_PEOPLE = 8;
+    */
 }

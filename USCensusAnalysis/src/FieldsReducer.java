@@ -14,7 +14,7 @@ public class FieldsReducer extends Reducer<Text, IntArrayWritable, Text, Text> {
     public void setup(Context context){
         JobTypeFactory jobTypeFactory = JobTypeFactory.getInstance();
         Configuration conf = context.getConfiguration();
-        jobType = jobTypeFactory.getJobType(conf.getInt("JobType", 0));
+        jobType = jobTypeFactory.getJobType(conf.getEnum(Util.JOB_TYPE, AnalysisType.NOTHING));
     }
 
     public void reduce(Text key, Iterable<IntArrayWritable> value, Context context) throws IOException, InterruptedException {

@@ -57,7 +57,7 @@ public class GenderAgeDistribution implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.GENDER_AGE_DIST);
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.GENDER_AGE_DIST);
 
         Job job = Job.getInstance(conf, "Gender Age Dist");
 

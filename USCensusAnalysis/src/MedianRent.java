@@ -54,7 +54,7 @@ public class MedianRent implements JobType, MedianJob {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.MEDIAN_RENT);
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.MEDIAN_RENT);
 
         Job job = Job.getInstance(conf, "Median Rent");
 

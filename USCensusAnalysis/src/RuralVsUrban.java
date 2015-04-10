@@ -32,7 +32,8 @@ public class RuralVsUrban implements JobType {
     @Override
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
-        conf.setInt(AnalysisType.JOB_TYPE, AnalysisType.RURAL_URBAN);
+
+        conf.setEnum(Util.JOB_TYPE, AnalysisType.RURAL_URBAN);
 
         Job job = Job.getInstance(conf, "Urban vs Rural");
 
