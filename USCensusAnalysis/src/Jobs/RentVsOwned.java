@@ -1,3 +1,11 @@
+package Jobs;
+
+import JobTypes.GenericJob;
+import JobTypes.JobType;
+import Mappers.GenericMapper;
+import Reducers.GenericReducer;
+import Util.Util;
+import Writables.IntArrayWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -7,7 +15,7 @@ import java.io.IOException;
 /**
  * Created by ydubale on 4/4/15.
  */
-public class RentVsOwned implements JobType {
+public class RentVsOwned implements GenericJob {
 
     private static final int OWNED_START = 1803;
     private static final int OWNED_END = OWNED_START + 9;
@@ -16,7 +24,7 @@ public class RentVsOwned implements JobType {
     private static final int RENTED_END = RENTED_START + 9;
 
     @Override
-    public int[] getFields(String line) throws StringIndexOutOfBoundsException, NumberFormatException {
+    public int[] map(String line) throws StringIndexOutOfBoundsException, NumberFormatException {
         if(!Util.correctSegment(line, 2)) return null;
 
         String ownedStr = line.substring(OWNED_START, OWNED_END);
@@ -29,17 +37,17 @@ public class RentVsOwned implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setEnum(Util.JOB_TYPE, AnalysisType.OWNED_RENTED);
+        conf.setEnum(Util.JOB_TYPE, JobType.OWNED_RENTED);
 
         Job job = Job.getInstance(conf, "Rent vs Owned");
 
-        job.setMapperClass(FieldsMapper.class);
+        job.setMapperClass(GenericMapper.class);
 
         job.setMapOutputKeyClass(Text.class);
 
         job.setMapOutputValueClass(IntArrayWritable.class);
 
-        job.setReducerClass(FieldsReducer.class);
+        job.setReducerClass(GenericReducer.class);
 
         return job;
     }

@@ -1,3 +1,11 @@
+package Reducers;
+
+import JobTypes.GenericJob;
+import JobTypes.JobType;
+import JobTypes.JobTypeFactory;
+import JobTypes.MedianJob;
+import Util.Util;
+import Writables.IntArrayWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -11,13 +19,13 @@ import java.util.Map;
  */
 public class MedianReducer extends Reducer<Text, IntArrayWritable, Text, Text> {
 
-    private JobType jobType;
+    private GenericJob jobType;
     private Map<Text, int[]> stateToVals = new HashMap<>();
 
     public void setup(Context context){
         JobTypeFactory jobTypeFactory = JobTypeFactory.getInstance();
         Configuration conf = context.getConfiguration();
-        jobType = jobTypeFactory.getJobType(conf.getEnum(Util.JOB_TYPE, AnalysisType.NOTHING));
+        jobType = jobTypeFactory.getJobType(conf.getEnum(Util.JOB_TYPE, JobType.NOTHING));
     }
 
     public void reduce(Text key, Iterable<IntArrayWritable> value, Context context) throws IOException, InterruptedException {
@@ -43,7 +51,7 @@ public class MedianReducer extends Reducer<Text, IntArrayWritable, Text, Text> {
     }
 
 
-    public void cleanup(Reducer.Context context) throws IOException, InterruptedException {
+    public void cleanup(Context context) throws IOException, InterruptedException {
 
         for(Text state : stateToVals.keySet()){
             //context.write(state, new IntArrayWritable(stateToVals.get(state)));

@@ -1,3 +1,10 @@
+package Jobs;
+
+import JobTypes.GenericJob;
+import JobTypes.JobType;
+import Util.Util;
+import Mappers.GenericMapper;
+import Writables.IntArrayWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.NullWritable;
@@ -12,7 +19,7 @@ import java.util.Collections;
 /**
  * Created by ydubale on 4/9/15.
  */
-public class AvgNumRooms implements JobType {
+public class AvgNumRooms implements GenericJob {
 
     private static final int SEGMENT = 2;
 
@@ -23,7 +30,7 @@ public class AvgNumRooms implements JobType {
     private static final int NUM_ROOMS_END = NUM_ROOMS_START + (NUM_FIELDS * FIELD_SIZE);
 
     @Override
-    public int[] getFields(String line) throws StringIndexOutOfBoundsException {
+    public int[] map(String line) throws StringIndexOutOfBoundsException {
         if(!Util.correctSegment(line, SEGMENT)) return null;
 
         //Last index holds the sum
@@ -46,11 +53,11 @@ public class AvgNumRooms implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setEnum(Util.JOB_TYPE, AnalysisType.AVG_NUM_ROOMS);
+        conf.setEnum(Util.JOB_TYPE, JobType.AVG_NUM_ROOMS);
 
         Job job = Job.getInstance(conf, "Avg Num Rooms");
 
-        job.setMapperClass(FieldsMapper.class);
+        job.setMapperClass(GenericMapper.class);
 
         job.setMapOutputKeyClass(Text.class);
 

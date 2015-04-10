@@ -1,3 +1,6 @@
+package Partitioners;
+
+import Writables.IntArrayWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Partitioner;
 

@@ -1,3 +1,9 @@
+package Jobs;
+
+import JobTypes.GenericJob;
+import JobTypes.JobType;
+import Util.Util;
+import Writables.IntArrayWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
@@ -12,7 +18,7 @@ import java.util.Set;
 /**
  * Created by ydubale on 4/9/15.
  */
-public class ElderlyPeople implements JobType {
+public class ElderlyPeople implements GenericJob {
 
     private static final int SEGMENT = 1;
 
@@ -25,7 +31,7 @@ public class ElderlyPeople implements JobType {
     private static final int TOTAL_PERSONS_END = TOTAL_PERSONS_START + FIELD_SIZE;
 
     @Override
-    public int[] getFields(String line) throws StringIndexOutOfBoundsException {
+    public int[] map(String line) throws StringIndexOutOfBoundsException {
         if(!Util.correctSegment(line, SEGMENT)) return null;
 
         String over_85 = line.substring(OVER_85_START, OVER_85_END);
@@ -40,7 +46,7 @@ public class ElderlyPeople implements JobType {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setEnum(Util.JOB_TYPE, AnalysisType.ELDERLY_PEOPLE);
+        conf.setEnum(Util.JOB_TYPE, JobType.ELDERLY_PEOPLE);
 
         Job job = Job.getInstance(conf, "Elderly People");
 

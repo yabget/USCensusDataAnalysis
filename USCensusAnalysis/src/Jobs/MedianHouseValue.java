@@ -1,3 +1,13 @@
+package Jobs;
+
+import JobTypes.GenericJob;
+import JobTypes.JobType;
+import JobTypes.MedianJob;
+import Mappers.GenericMapper;
+import Partitioners.StatePartitioner;
+import Reducers.MedianReducer;
+import Util.Util;
+import Writables.IntArrayWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -7,7 +17,7 @@ import java.io.IOException;
 /**
  * Created by ydubale on 4/8/15.
  */
-public class MedianHouseValue implements JobType, MedianJob {
+public class MedianHouseValue implements GenericJob, MedianJob {
 
     private static final int SEGMENT = 2;
 
@@ -41,7 +51,7 @@ public class MedianHouseValue implements JobType, MedianJob {
     };
 
     @Override
-    public int[] getFields(String line) throws StringIndexOutOfBoundsException {
+    public int[] map(String line) throws StringIndexOutOfBoundsException {
         if(!Util.correctSegment(line, SEGMENT)) return null;
 
         int[] fields = new int[NUM_FIELDS];
@@ -57,11 +67,11 @@ public class MedianHouseValue implements JobType, MedianJob {
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setEnum(Util.JOB_TYPE, AnalysisType.MEDIAN_HOUSE_VALUE);
+        conf.setEnum(Util.JOB_TYPE, JobType.MEDIAN_HOUSE_VALUE);
 
         Job job = Job.getInstance(conf, "Median House Value");
 
-        job.setMapperClass(FieldsMapper.class);
+        job.setMapperClass(GenericMapper.class);
 
         job.setMapOutputKeyClass(Text.class);
 

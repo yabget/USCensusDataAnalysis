@@ -1,3 +1,10 @@
+package Mappers;
+
+import JobTypes.GenericJob;
+import Util.Util;
+import JobTypes.JobType;
+import JobTypes.JobTypeFactory;
+import Writables.IntArrayWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -8,14 +15,14 @@ import java.io.IOException;
 /**
  * Created by ydubale on 4/6/15.
  */
-public class FieldsMapper extends Mapper<LongWritable, Text, Text, IntArrayWritable> {
+public class GenericMapper extends Mapper<LongWritable, Text, Text, IntArrayWritable> {
 
-    private JobType jobType;
+    private GenericJob jobType;
 
     public void setup(Context context){
         JobTypeFactory jobTypeFactory = JobTypeFactory.getInstance();
         Configuration conf = context.getConfiguration();
-        jobType = jobTypeFactory.getJobType(conf.getEnum(Util.JOB_TYPE, AnalysisType.NOTHING));
+        jobType = jobTypeFactory.getJobType(conf.getEnum(Util.JOB_TYPE, JobType.NOTHING));
     }
 
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -33,15 +40,12 @@ public class FieldsMapper extends Mapper<LongWritable, Text, Text, IntArrayWrita
 
         int[] outVals;
         try {
-            outVals = jobType.getFields(line);
+            outVals = jobType.map(line);
             if(outVals == null){
                 return;
             }
         }
-        catch (NumberFormatException numForm){
-            return;
-        }
-        catch (StringIndexOutOfBoundsException sout){
+        catch (NumberFormatException | StringIndexOutOfBoundsException numForm){
             return;
         }
 

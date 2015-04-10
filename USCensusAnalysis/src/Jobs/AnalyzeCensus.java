@@ -1,3 +1,7 @@
+package Jobs;
+
+import JobTypes.JobType;
+import JobTypes.JobTypeFactory;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -10,22 +14,22 @@ import java.io.IOException;
  */
 public class AnalyzeCensus {
 
-    public static void runJob(AnalysisType analysisType, String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Job job = JobTypeFactory.getInstance().getJobType(analysisType).getJob();
+    public static void runJob(JobType jobType, String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        Job job = JobTypeFactory.getInstance().getJobType(jobType).getJob();
 
         job.setJarByClass(AnalyzeCensus.class);
 
         FileInputFormat.setInputPaths(job, new Path(args[1]));
 
-        FileOutputFormat.setOutputPath(job, new Path("/analyzeCensus/output/" + analysisType));
+        FileOutputFormat.setOutputPath(job, new Path("/analyzeCensus/output/" + jobType));
 
         job.waitForCompletion(false);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 
-        for(AnalysisType jobName : AnalysisType.values()){
-            if(jobName.equals(AnalysisType.NOTHING)) continue;
+        for(JobType jobName : JobType.values()){
+            if(jobName.equals(JobType.NOTHING)) continue;
 
             System.out.println("RUNNNING JOB " + jobName);
             runJob(jobName, args);

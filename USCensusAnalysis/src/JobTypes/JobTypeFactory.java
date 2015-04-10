@@ -1,3 +1,7 @@
+package JobTypes;
+
+import Jobs.*;
+
 /**
  * Created by ydubale on 4/6/15.
  */
@@ -11,11 +15,9 @@ public class JobTypeFactory {
     private JobTypeFactory() {
     }
 
-    public JobType getJobType(AnalysisType analysisType){
-
-        JobType jobType = null;
-
-        switch (analysisType){
+    public GenericJob getJobType(JobType jobType){
+        
+        switch (jobType){
             case NEVER_MARRIED:
                 return new NeverMarried();
 
@@ -39,8 +41,9 @@ public class JobTypeFactory {
 
             case ELDERLY_PEOPLE:
                 return new ElderlyPeople();
+
         }
 
-        return jobType;
+        return null;
     }
 }

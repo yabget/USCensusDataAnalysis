@@ -1,7 +1,9 @@
+package JobTypes;
+
 /**
  * Created by ydubale on 4/6/15.
  */
-public enum AnalysisType {
+public enum JobType {
     NOTHING,
     OWNED_RENTED,
     NEVER_MARRIED,
