@@ -4,9 +4,11 @@
 public class Util {
 
     public static final String JOB_TYPE = "JobType";
+    public static final int RECORD_PART_NUMBER_START = 24;
+    public static final int RECODR_PART_NUMBER_END = 28;
 
     public static boolean correctSegment(String line, int segment){
-        return Integer.parseInt(line.substring(24, 28)) == segment;
+        return Integer.parseInt(line.substring(RECORD_PART_NUMBER_START, RECODR_PART_NUMBER_END)) == segment;
     }
 
     public static int[] convertStringsToInts(String... strings){
@@ -20,14 +22,4 @@ public class Util {
 
         return nums;
     }
-
-    public static void printValidCommands(){
-        System.out.println("Valid commands are: ");
-        System.out.println("\t\tNM - Never Married");
-        System.out.println("\t\tRvO - Rent vs Owned");
-        System.out.println("\t\tRvU - Rural vs Urban");
-        System.out.println("\t\tGAD - Gender Age Distribution");
-
-    }
-
 }

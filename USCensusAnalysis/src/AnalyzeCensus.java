@@ -29,7 +29,7 @@ public class AnalyzeCensus {
 
             System.out.println("RUNNNING JOB " + jobName);
             runJob(jobName, args);
-            System.out.println("JOB " + jobName + " COMPLETED!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("JOB " + jobName + " COMPLETED\n\n\n");
         }
 
     }
