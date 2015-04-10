@@ -11,4 +11,6 @@ public class AnalysisType {
     public static final int RURAL_URBAN = 4;
     public static final int MEDIAN_HOUSE_VALUE = 5;
     public static final int MEDIAN_RENT = 6;
+    public static final int AVG_NUM_ROOMS = 7;
+    public static final int ELDERLY_PEOPLE = 8;
 }

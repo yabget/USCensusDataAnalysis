@@ -33,6 +33,12 @@ public class JobTypeFactory {
 
             case AnalysisType.MEDIAN_RENT:
                 return new MedianRent();
+
+            case AnalysisType.AVG_NUM_ROOMS:
+                return new AvgNumRooms();
+
+            case AnalysisType.ELDERLY_PEOPLE:
+                return new ElderlyPeople();
         }
 
         return jobType;

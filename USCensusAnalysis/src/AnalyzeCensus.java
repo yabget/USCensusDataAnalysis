@@ -13,6 +13,7 @@ public class AnalyzeCensus {
     public static Job getJob(String jobAbbr) throws IOException {
 
         switch (jobAbbr){
+            //TODO: MAKE GET JOB STATIC
             case "RvO":
                 return (new RentVsOwned()).getJob();
 
@@ -31,6 +32,12 @@ public class AnalyzeCensus {
             case "MR":
                 return (new MedianRent()).getJob();
 
+            case "ANR":
+                return (new AvgNumRooms()).getJob();
+
+            case "EP":
+                return (new ElderlyPeople()).getJob();
+
             default:
                 Util.printValidCommands();
                 System.exit(1);
@@ -38,16 +45,26 @@ public class AnalyzeCensus {
         return null;
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Job job = getJob(args[0]);
+    public static void runJob(String jobName, String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        Job job = getJob(jobName);
 
         job.setJarByClass(AnalyzeCensus.class);
 
         FileInputFormat.setInputPaths(job, new Path(args[1]));
 
-        FileOutputFormat.setOutputPath(job, new Path(args[2]));
+        FileOutputFormat.setOutputPath(job, new Path("/analyzeCensus/output/" + jobName));
 
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        job.waitForCompletion(true);
+    }
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+
+        String[] jobNames = {"RvO", "NM", "GAD", "RvU", "MHV", "MR", "ANR", "EP" };
+
+        for(String jobName : jobNames){
+            runJob(jobName, args);
+            System.out.println("JOB " + jobName + " COMPLETED!!!!!!!!!!!!!!!!!!!!!");
+        }
 
     }
 }
