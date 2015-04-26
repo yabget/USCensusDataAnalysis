@@ -1,18 +1,17 @@
 package Jobs;
 
 import JobTypes.GenericJob;
-import JobTypes.JobType;
 import JobTypes.MedianJob;
-import Mappers.GenericMapper;
-import Partitioners.StatePartitioner;
-import Reducers.MedianReducer;
 import Util.Util;
 import Writables.IntArrayWritable;
-import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by ydubale on 4/8/15.
@@ -51,48 +50,35 @@ public class MedianHouseValue implements GenericJob, MedianJob {
     };
 
     @Override
-    public int[] map(String line) throws StringIndexOutOfBoundsException {
-        if(!Util.correctSegment(line, SEGMENT)) return null;
-
-        int[] fields = new int[NUM_FIELDS];
-        int index = 0;
-        for(int i=HOUSE_VALUE_START; i < HOUSE_VALUE_END; i+=FIELD_SIZE){
-            fields[index] = Integer.parseInt(line.substring(i, i+FIELD_SIZE));
-            index++;
-        }
-        return fields;
-    }
-
-    @Override
     public Job getJob() throws IOException {
-        Configuration conf = new Configuration();
-
-        conf.setEnum(Util.JOB_TYPE, JobType.MEDIAN_HOUSE_VALUE);
-
-        Job job = Job.getInstance(conf, "Median House Value");
-
-        job.setMapperClass(GenericMapper.class);
-
-        job.setMapOutputKeyClass(Text.class);
-
-        job.setMapOutputValueClass(IntArrayWritable.class);
-
-        job.setNumReduceTasks(50);
-
-        job.setPartitionerClass(StatePartitioner.class);
-
-        job.setReducerClass(MedianReducer.class);
-
-        return job;
-    }
-
-    @Override
-    public String reduce(Iterable<IntArrayWritable> value) {
         return null;
     }
 
     @Override
-    public int getNumRanges() {
+    public void reduce(Text key, List<IntArrayWritable> value, Reducer.Context context, int fieldOffset) throws IOException, InterruptedException {
+        int index = Util.generalMedianReducer(value, fieldOffset, NUM_FIELDS);
+        if(index != -1){
+            context.write(key, new Text("\tMedian house value: " + houseCosts[index]));
+        }
+    }
+
+    @Override
+    public List<IntWritable> getWritable(String line) {
+        if(!Util.correctSegment(line, SEGMENT)){
+            return Util.getPlaceHolder(NUM_FIELDS);
+        }
+
+        List<IntWritable> list = new LinkedList<>();
+
+        for(int i=HOUSE_VALUE_START; i < HOUSE_VALUE_END; i+=FIELD_SIZE){
+            list.add(new IntWritable(Integer.parseInt(line.substring(i, i+FIELD_SIZE))));
+        }
+
+        return list;
+    }
+
+    @Override
+    public int getNumFields() {
         return NUM_FIELDS;
     }
 

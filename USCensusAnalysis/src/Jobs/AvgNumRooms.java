@@ -3,18 +3,17 @@ package Jobs;
 import JobTypes.GenericJob;
 import JobTypes.JobType;
 import Util.Util;
-import Mappers.GenericMapper;
 import Writables.IntArrayWritable;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by ydubale on 4/9/15.
@@ -30,36 +29,16 @@ public class AvgNumRooms implements GenericJob {
     private static final int NUM_ROOMS_END = NUM_ROOMS_START + (NUM_FIELDS * FIELD_SIZE);
 
     @Override
-    public int[] map(String line) throws StringIndexOutOfBoundsException {
-        if(!Util.correctSegment(line, SEGMENT)) return null;
-
-        //Last index holds the sum
-        int sum = 0;
-        int index = 1;
-        int numOfThings = 0;
-        for(int i = NUM_ROOMS_START; i < NUM_ROOMS_END; i+=9){
-            int val = Integer.parseInt(line.substring(i, i+FIELD_SIZE));
-            numOfThings += val;
-            sum += (val * index); // Val * num_room
-            index++;
-        }
-
-        int[] avg = {sum, numOfThings};
-
-        return avg;
-    }
-
-    @Override
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setEnum(Util.JOB_TYPE, JobType.AVG_NUM_ROOMS);
+        conf.setInt(Util.JOB_TYPE, JobType.AVG_NUM_ROOMS);
 
         Job job = Job.getInstance(conf, "Avg Num Rooms");
 
-        job.setMapperClass(GenericMapper.class);
+        job.setMapperClass(AvgNumRoomsMapper.class);
 
-        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputKeyClass(NullWritable.class);
 
         job.setMapOutputValueClass(IntArrayWritable.class);
 
@@ -70,35 +49,86 @@ public class AvgNumRooms implements GenericJob {
         return job;
     }
 
-    public static class AvgNumRoomsReducer extends Reducer<Text, IntArrayWritable, DoubleWritable, NullWritable>{
+    public static class AvgNumRoomsMapper extends Mapper<LongWritable, Text, NullWritable, IntArrayWritable> {
 
-        private ArrayList<Double> averages = new ArrayList<>();
+        private static final AvgNumRooms avgNumRooms = new AvgNumRooms();
 
-        public void reduce(Text key, Iterable<IntArrayWritable> value, Context context) throws IOException, InterruptedException {
-            double avg = 0;
-            for(IntArrayWritable val : value){
-                avg = (double)val.get()[0]/val.get()[1];
+        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+
+            String line = value.toString();
+
+            int sumLevel = Integer.parseInt(line.substring(10, 13));
+
+            if(sumLevel != 100){ //Make sure summary level is 100
+                return;
             }
+
+            context.write(NullWritable.get(), new IntArrayWritable(avgNumRooms.getWritable(line)));
+        }
+    }
+
+    public static class AvgNumRoomsReducer extends Reducer<NullWritable, IntArrayWritable, Text, DoubleWritable> {
+
+        private List<Double> averages = new LinkedList<>();
+
+        public void reduce(NullWritable key, Iterable<IntArrayWritable> value, Context context){
+            int[] values = new int[NUM_FIELDS];
+
+            for(IntArrayWritable field : value){
+                int[] nums = field.get();
+
+                for (int i=0; i < NUM_FIELDS; i++){
+                    values[i] += nums[i];
+                }
+            }
+
+            long sum =0;
+            long totalCount = 0;
+
+            int numRoom = 1;
+            for(int val : values){
+                //context.write(new Text(numRoom + " room:"), new LongWritable(val));
+                totalCount += val;
+                sum += val * numRoom;
+                numRoom++;
+            }
+
+            double avg = (double) sum / totalCount;
             averages.add(avg);
-            context.write(new DoubleWritable(avg), NullWritable.get());
         }
 
         public void cleanup(Context context) throws IOException, InterruptedException {
             Collections.sort(averages);
 
-            double percentile95th = averages.get((int)(averages.size() * .95));
+            int percentile95th = (int)(averages.size() * 0.95);
 
-            context.write(new DoubleWritable(percentile95th), NullWritable.get());
+            context.write(new Text("95th percentile of the average number of rooms per house across all states"),
+                    new DoubleWritable(averages.get(percentile95th)));
+
         }
     }
 
-    //Gets the average per state
     @Override
-    public String reduce(Iterable<IntArrayWritable> value) {
-        double avg = 0;
-        for(IntArrayWritable val : value){
-            avg = (double)val.get()[0]/val.get()[1];
+    public void reduce(Text key, List<IntArrayWritable> value, Reducer.Context context, int fieldOffset) throws IOException, InterruptedException {
+    }
+
+    @Override
+    public List<IntWritable> getWritable(String line) {
+
+        if(!Util.correctSegment(line, SEGMENT)){
+            return Util.getPlaceHolder(NUM_FIELDS);
         }
-        return avg +"";
+
+        List<IntWritable> list = new LinkedList<>();
+        for(int i=NUM_ROOMS_START; i < NUM_ROOMS_END; i+= FIELD_SIZE){
+            list.add(new IntWritable(Integer.parseInt(line.substring(i, i+FIELD_SIZE))));
+        }
+
+        return list;
+    }
+
+    @Override
+    public int getNumFields() {
+        return NUM_FIELDS;
     }
 }

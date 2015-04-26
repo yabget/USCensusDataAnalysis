@@ -11,9 +11,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by ydubale on 4/9/15.
@@ -23,6 +21,7 @@ public class ElderlyPeople implements GenericJob {
     private static final int SEGMENT = 1;
 
     private static final int FIELD_SIZE = 9;
+    private static final int NUM_FIELDS = 2;
 
     private static final int OVER_85_START = 1065;
     private static final int OVER_85_END = OVER_85_START + FIELD_SIZE;
@@ -31,22 +30,10 @@ public class ElderlyPeople implements GenericJob {
     private static final int TOTAL_PERSONS_END = TOTAL_PERSONS_START + FIELD_SIZE;
 
     @Override
-    public int[] map(String line) throws StringIndexOutOfBoundsException {
-        if(!Util.correctSegment(line, SEGMENT)) return null;
-
-        String over_85 = line.substring(OVER_85_START, OVER_85_END);
-        String total = line.substring(TOTAL_PERSONS_START, TOTAL_PERSONS_END);
-
-        if(Integer.parseInt(total) == 0) return null;
-
-        return Util.convertStringsToInts(over_85, total);
-    }
-
-    @Override
     public Job getJob() throws IOException {
         Configuration conf = new Configuration();
 
-        conf.setEnum(Util.JOB_TYPE, JobType.ELDERLY_PEOPLE);
+        conf.setInt(Util.JOB_TYPE, JobType.ELDERLY_PEOPLE);
 
         Job job = Job.getInstance(conf, "Elderly People");
 
@@ -80,16 +67,16 @@ public class ElderlyPeople implements GenericJob {
 
             Text state = new Text(line.substring(8, 10));
 
-            int[] outVals;
             try {
                 if(!Util.correctSegment(line, SEGMENT)) return;
 
                 String over_85 = line.substring(OVER_85_START, OVER_85_END);
                 String total = line.substring(TOTAL_PERSONS_START, TOTAL_PERSONS_END);
 
-                outVals = Util.convertStringsToInts(over_85, total);
+                int over85Int = Integer.parseInt(over_85);
+                int totalInt = Integer.parseInt(total);
 
-                if(outVals == null || outVals[1] == 0){
+                if(totalInt == 0){
                     return;
                 }
 
@@ -99,8 +86,8 @@ public class ElderlyPeople implements GenericJob {
                     stateToFields.put(state, over85_total);
                 }
 
-                over85_total[0] += outVals[0];
-                over85_total[1] += outVals[1];
+                over85_total[0] += over85Int;
+                over85_total[1] += totalInt;
             }
             catch (NumberFormatException | StringIndexOutOfBoundsException ignored){
             }
@@ -131,7 +118,6 @@ public class ElderlyPeople implements GenericJob {
         }
     }
 
-
     public static class ElderlyPeopleReducer extends Reducer<NullWritable,MapWritable, Text, DoubleWritable> {
 
         private Text maxState = new Text();
@@ -158,9 +144,18 @@ public class ElderlyPeople implements GenericJob {
         }
     }
 
+    @Override
+    public int getNumFields() {
+        return NUM_FIELDS;
+    }
 
     @Override
-    public String reduce(Iterable<IntArrayWritable> value) {
+    public void reduce(Text key, List<IntArrayWritable> value, Reducer.Context context, int fieldOffset) throws IOException, InterruptedException {
+
+    }
+
+    @Override
+    public List<IntWritable> getWritable(String line) {
         return null;
     }
 }

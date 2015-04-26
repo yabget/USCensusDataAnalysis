@@ -1,16 +1,16 @@
 package Jobs;
 
 import JobTypes.GenericJob;
-import JobTypes.JobType;
-import Mappers.GenericMapper;
-import Reducers.GenericReducer;
 import Util.Util;
 import Writables.IntArrayWritable;
-import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by ydubale on 4/6/15.
@@ -18,6 +18,8 @@ import java.io.IOException;
 public class GenderAgeDistribution implements GenericJob {
 
     // All age boundaries are inclusive
+
+    private static final int NUM_FIELDS = 6;
 
     private static final int MALE_UNDER_18_START = 3864;
     private static final int MALE_UNDER_18_END = MALE_UNDER_18_START + (13 * 9);
@@ -37,63 +39,60 @@ public class GenderAgeDistribution implements GenericJob {
     private static final int FEMALE_30_TO_39_START = FEMALE_19_TO_29_END;
     private static final int FEMALE_30_TO_39_END = FEMALE_30_TO_39_START + (2 * 9);
 
-    private int getSumAgeRange(String line, int start, int end){
-        int sum = 0;
-        for(int i= start; i <= end; i+=9){
-            sum += Integer.parseInt(line.substring(i, i+9));
-        }
-        return sum;
-    }
-
-    @Override
-    public int[] map(String line) throws StringIndexOutOfBoundsException {
-        if(!Util.correctSegment(line, 1)) return null;
-
-        int[] ranges = new int[6];
-        ranges[0] = getSumAgeRange(line, MALE_UNDER_18_START, MALE_UNDER_18_END);
-        ranges[1] = getSumAgeRange(line, MALE_19_TO_29_START, MALE_19_TO_29_END);
-        ranges[2] = getSumAgeRange(line, MALE_30_TO_39_START, MALE_30_TO_39_END);
-
-        ranges[3] = getSumAgeRange(line, FEMALE_UNDER_18_START, FEMALE_UNDER_18_END);
-        ranges[4] = getSumAgeRange(line, FEMALE_19_TO_29_START, FEMALE_19_TO_29_END);
-        ranges[5] = getSumAgeRange(line, FEMALE_30_TO_39_START, FEMALE_30_TO_39_END);
-
-        return ranges;
-    }
-
     @Override
     public Job getJob() throws IOException {
-        Configuration conf = new Configuration();
-
-        conf.setEnum(Util.JOB_TYPE, JobType.GENDER_AGE_DIST);
-
-        Job job = Job.getInstance(conf, "Gender Age Dist");
-
-        job.setMapperClass(GenericMapper.class);
-
-        job.setMapOutputKeyClass(Text.class);
-
-        job.setMapOutputValueClass(IntArrayWritable.class);
-
-        job.setReducerClass(GenericReducer.class);
-
-        return job;
+        return null;
     }
 
     @Override
-    public String reduce(Iterable<IntArrayWritable> value) {
+    public void reduce(Text key, List<IntArrayWritable> value, Reducer.Context context, int fieldOffset) throws IOException, InterruptedException {
+
         int maleLess18 =0, male20to29 =0, male30to39 = 0;
         int femLess18 = 0, fem20to29= 0, fem30to39 = 0;
 
-        for(IntArrayWritable field : value){
-            maleLess18 += field.get()[0];
-            male20to29 += field.get()[1];
-            male30to39 += field.get()[2];
-            femLess18 += field.get()[3];
-            fem20to29 += field.get()[4];
-            fem30to39 += field.get()[5];
+        for(IntArrayWritable val : value){
+            int[] fields = val.get();
+
+            maleLess18 += Util.sumFields(fields, fieldOffset, fieldOffset);
+            male20to29 += Util.sumFields(fields, fieldOffset +1, fieldOffset +1);
+            male30to39 += Util.sumFields(fields, fieldOffset +2, fieldOffset +2);
+            femLess18 += Util.sumFields(fields, fieldOffset +3, fieldOffset +3);
+            fem20to29 += Util.sumFields(fields, fieldOffset +4, fieldOffset +4);
+            fem30to39 += Util.sumFields(fields, fieldOffset +5, fieldOffset +5);
         }
 
-        return maleLess18 + " " + male20to29 + " " + male30to39  + " " + femLess18 + " " + fem20to29  + " " + fem30to39;
+        context.write(key,
+                new Text("\tGender Age Dist: " + maleLess18 + " " + male20to29 + " " + male30to39  + " "
+                        + femLess18 + " " + fem20to29  + " " + fem30to39));
+
+    }
+
+    @Override
+    public List<IntWritable> getWritable(String line) {
+        if(!Util.correctSegment(line, 1)){
+            return Util.getPlaceHolder(NUM_FIELDS);
+        }
+
+        int[] ranges = new int[NUM_FIELDS];
+        ranges[0] = Util.getSumRange(line, MALE_UNDER_18_START, MALE_UNDER_18_END);
+        ranges[1] = Util.getSumRange(line, MALE_19_TO_29_START, MALE_19_TO_29_END);
+        ranges[2] = Util.getSumRange(line, MALE_30_TO_39_START, MALE_30_TO_39_END);
+
+        ranges[3] = Util.getSumRange(line, FEMALE_UNDER_18_START, FEMALE_UNDER_18_END);
+        ranges[4] = Util.getSumRange(line, FEMALE_19_TO_29_START, FEMALE_19_TO_29_END);
+        ranges[5] = Util.getSumRange(line, FEMALE_30_TO_39_START, FEMALE_30_TO_39_END);
+
+
+        List<IntWritable> list = new LinkedList<>();
+        for(int i=0; i < ranges.length; i++){
+            list.add(new IntWritable(ranges[i]));
+        }
+
+        return list;
+    }
+
+    @Override
+    public int getNumFields() {
+        return NUM_FIELDS;
     }
 }

@@ -1,15 +1,17 @@
 package Writables;
 
-import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by ydubale on 4/4/15.
  */
-public class IntArrayWritable implements WritableComparable {
+public class IntArrayWritable implements Writable {
 
     private int[] values;
 
@@ -21,21 +23,17 @@ public class IntArrayWritable implements WritableComparable {
         this.values = values;
     }
 
-    public int[] get(){
-        return values;
+    public IntArrayWritable(List<IntWritable> intWritables){
+        values = new int[intWritables.size()];
+        int index = 0;
+        for(IntWritable i : intWritables){
+            values[index] = i.get();
+            index++;
+        }
     }
 
-    /**
-     * todo: look into how this can be done
-     * @param o
-     * @return
-     */
-    @Override
-    public int compareTo(Object o) {
-        if(!(o instanceof IntArrayWritable)){
-            throw new ClassCastException();
-        }
-        return 0;
+    public int[] get(){
+        return values;
     }
 
     public String toString(){
